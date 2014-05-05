@@ -5,6 +5,8 @@ Package.describe({
 Package.on_use(function(api){
   api.use('underscore',['client','server']);
   api.use('ui','client');
+  api.use('bootstrap-3','client');
+  api.use('reactive-dict',['client','server']);
 
   api.add_files(['font/fontawesome-webfont.eot','font/fontawesome-webfont.ttf','font/fontawesome-webfont.woff','font/FontAwesome.otf'],'client');
 
