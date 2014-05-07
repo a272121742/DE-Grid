@@ -652,7 +652,6 @@
       action : []
     });
     _.defaults(config.Selection,{
-      enabled : false,
       selector : {}
     });
     if(Match.test(config.FieldSet,{})){
@@ -828,7 +827,7 @@
      *  default     :  {} (数据全查询)
      *  example     :  selector = {age : {$gt : 18}} (搜索年龄大于18岁的)
      */
-    CurrentSession.setDefault('Selection.selector',{});
+    CurrentSession.setDefault('Selection.selector',config.Selection.selector);
     //FieldSet
     /**
      *  description :  查询字段
