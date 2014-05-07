@@ -424,7 +424,7 @@
                   var dataTotal = CurrentCollection.find(selector).count();
                   var pageLimit = CurrentSession.get('Pagination.pageLimit');
                   var currentNumber = CurrentSession.get('Pagination.currentNumber');
-                  var pageSkip = (currentNumber - 1) * pageLimit + 1;
+                  var pageSkip = (currentNumber - 1) * pageLimit;
                   var pageCount = Math.ceil(dataTotal / pageLimit);
                   var pageInfo = CurrentSession.get('Pagination.pageInfo').replace('{{pageLimit}}',pageLimit).replace('{{dataTotal}}',dataTotal).replace('{{pageCount}}',pageCount).replace('{{currentNumber}}',currentNumber);
                   var showNumberLevel = CurrentSession.get('Pagination.showNumberLevel');
