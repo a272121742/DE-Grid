@@ -27,6 +27,32 @@
     }
   }
   root.ActionSet = new ActionSet();
+
+  var formats = {};
+  function FormationSet(){
+  };
+  FormationSet.prototype.set = function(name,handler){
+    if(!_.isString(name)){
+      throw new Meteor.Error(500,'FormationSet的键必须是String类型');
+    }
+    if(_.isUndefined(handler)){
+      handler = DEFAULT_HANDLER;
+    }
+    if(!_.isFunction(handler)){
+      throw new Meteor.Error(500,'FormationSet的值必须是Function类型');
+    }
+    if(formats.hasOwnProperty(name)){
+      throw new Meteor.Error(500,'FormationSet配置错误，存在重复的Formation名');
+    }else{
+      formats[name] = handler;
+    }
+  };
+  FormationSet.prototype.get = function(name){
+    if(formats.hasOwnProperty(name)){
+      return formats[name];
+    }
+  };
+  root.FormationSet = new FormationSet();
 })(this);
 
 
@@ -268,12 +294,19 @@
                     var sorters2Object = CurrentSession.get('Sortation.sorters2Object');
                     var fields = CurrentSession.get('FieldSet.fields');
                     var selector = CurrentSession.get('Selection.selector');
+                    var collectionName = Collection._name;
                     return Collection.find(selector,{
                       limit : pageLimit,
                       skip : skip,
                       fields : fields,
                       sort : sorters2Object,
                       transform : function(doc){
+                        _.each(doc,function(value,fieldName){
+                          var handler = FormationSet.get(collectionName + '.' + fieldName);
+                          if(handler){
+                            doc[fieldName] = handler.call(self,value);
+                          }
+                        });
                         doc.Scope = self;
                         return doc;
                       }
@@ -624,7 +657,7 @@
       Sortation : {},
       Pagination : {},
       Columniation : {},
-      Selection : {},
+      Selection : {}
     });
     _.defaults(config.Global,{
       action : [],
