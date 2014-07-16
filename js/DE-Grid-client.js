@@ -243,7 +243,6 @@
                             }
                             _.each(names_shows,function(value,key){
                               cols.push(HTML.TD(function(){
-                                return Spacebars.mustache(self.lookup(key));
                               }));
                             });
                             if(enableActionColumn){
