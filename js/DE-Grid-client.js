@@ -243,6 +243,12 @@
                             }
                             _.each(names_shows,function(value,key){
                               cols.push(HTML.TD(function(){
+                                var format = FormationSet.get(CurrentScope.Collection._name + '.' + key);
+                                if(format){
+                                  return format.call(undefined,self.lookup(key)());
+                                }else{
+                                  return Spacebars.mustache(self.lookup(key));
+                                }
                               }));
                             });
                             if(enableActionColumn){
@@ -300,12 +306,6 @@
                       fields : fields,
                       sort : sorters2Object,
                       transform : function(doc){
-                        _.each(doc,function(value,fieldName){
-                          var handler = FormationSet.get(collectionName + '.' + fieldName);
-                          if(handler){
-                            doc[fieldName] = handler.call(self,value);
-                          }
-                        });
                         doc.Scope = self;
                         return doc;
                       }
@@ -642,7 +642,10 @@
       return null;
     }
     var source = Collection.get(config.sourceName);
-    if(!source || !(source instanceof Meteor.Collection)){
+    if(!source){
+      return null;
+    }
+    if(!(source instanceof Meteor.Collection)){
       throw new Meteor.Error(500,'源码文件配置错误','配置的数据源必须是Meteor.Collection实例对象');
     }
     //获取数据源配置
