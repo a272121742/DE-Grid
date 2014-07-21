@@ -8,9 +8,11 @@ Package.on_use(function(api){
   api.use('bootstrap-3','client');
   api.use('reactive-dict',['client','server']);
 
+  api.use('Appliance','client');
+
   api.add_files(['font/fontawesome-webfont.eot','font/fontawesome-webfont.ttf','font/fontawesome-webfont.woff','font/FontAwesome.otf'],'client');
 
-  api.add_files(['images/sort_asc.png','images/sort_both.png','images/sort_desc.png'],'client'); 
+  api.add_files(['css/images/sort_asc.png','css/images/sort_both.png','css/images/sort_desc.png'],'client'); 
    
   api.add_files(['css/font-awesome.min.css','css/DE-Grid.css'],'client');
 
