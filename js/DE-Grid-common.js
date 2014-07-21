@@ -20,6 +20,10 @@ Collections.prototype.get = function(name){
   }
 };
 
+Collections.prototype.has = function(name){
+  return collections.hasOwnProperty(name);
+};
+
 Collection = new Collections();
 
 Collection.defined('GridManager');
