@@ -96,8 +96,6 @@
           var pageCount = Math.ceil(dataTotal / pageLimit);
           var pageInfo = CurrentSession.get('Pagination.pageInfo').replace('{{pageLimit}}',pageLimit).replace('{{dataTotal}}',dataTotal).replace('{{pageCount}}',pageCount).replace('{{currentNumber}}',currentNumber);
           var showNumberLevel = CurrentSession.get('Pagination.showNumberLevel');
-          var hasBefore = 2 * showNumberLevel < _.min([pageCount + 1, 2 * currentNumber]);
-          var hasAfter = 2 * showNumberLevel <= _.min([pageCount, 2 * (pageCount - currentNumber)]);
           var showCount = _.min([2 * showNumberLevel - 1, pageCount]);
           var showNumbers = [];
           var baseNumber = 1;
@@ -116,8 +114,6 @@
           CurrentSession.set('Pagination.pageSkip',pageSkip);
           CurrentSession.set('Pagination.dataTotal',dataTotal);
           CurrentSession.set('Pagination.pageCount',pageCount);
-          CurrentSession.set('Pagination.hasBefore',hasBefore);
-          CurrentSession.set('Pagination.hasAfter',hasAfter);
           CurrentSession.set('Pagination.showNumbers',showNumbers);
 
           var beforeType = currentNumber === 1 ? 'disabled' : 'enabled';
@@ -252,13 +248,12 @@
     kind : 'GridComponent',
     __GridView_Pagination__ : PaginationComponent,
     init : function(){
-      if(!this.hasParent('__ContainerComponent__')){
+      var Grid = self = this;
+      if(!self.hasParent('__ContainerComponent__')){
         throw new Meteor.Error(10000,'错误的模板书写格式','Grid必须包裹在Container中！');
       }
-      //get config 
-      var config = this.get('config');
-      //get Scope
-      var CurrentScope = this.getScope();
+      var config = self.get('config');
+      var CurrentScope = self.getScope();
       var CurrentSession = CurrentScope.Session;
       var CurrentCollection = CurrentScope.Collection = Collection.get(config.sourceName);
       _.defaults(config,{title : '列表', ActionSet : [], FieldSet : {}, Global : {}, Sortation : {}, Pagination : {}, Columniation : {}, Selection : {} });
@@ -278,19 +273,15 @@
       CurrentSession.setDefault('Pagination.pageCount',0);
       CurrentSession.setDefault('Pagination.pageFirst',config.Pagination.pageFirst);
       CurrentSession.setDefault('Pagination.pagePrev',config.Pagination.pagePrev);
-      CurrentSession.setDefault('Pagination.hasBefore',false);
-      CurrentSession.setDefault('Pagination.pageBefore','...');
       CurrentSession.setDefault('Pagination.showNumbers',[]);
       CurrentSession.setDefault('Pagination.showNumberLevel',config.Pagination.showNumberLevel);
-      CurrentSession.setDefault('Pagination.hasAfter',false);
-      CurrentSession.setDefault('Pagination.pageAfter','...');
       CurrentSession.setDefault('Pagination.pageNext',config.Pagination.pageNext);
       CurrentSession.setDefault('Pagination.pageLast',config.Pagination.pageLast);
       CurrentSession.setDefault('Pagination.pageInfo',config.Pagination.pageInfo);
       CurrentSession.setDefault('Pagination.enableLimitSelection',config.Pagination.enableLimitSelection);
       CurrentSession.setDefault('Pagination.pageLimitArray',config.Pagination.pageLimitArray);
       CurrentSession.setDefault('Columniation.autoId',!!config.Columniation.autoId);
-      CurrentSession.setDefault('Columniation.multiSelection',config.Columniation.multiSelection);
+      CurrentSession.setDefault('Columniation.multiSelection',!config.Columniation.multiSelection);
       CurrentSession.setDefault('Columniation.enableActionColumn',config.Columniation.enableActionColumn);
       CurrentSession.setDefault('Columniation.action',config.Columniation.action);
       CurrentSession.setDefault('Columniation.allowActionGroup',config.Columniation.allowActionGroup);
@@ -302,7 +293,6 @@
       CurrentSession.setDefault('Configuration.allowActionGroup',config.Global.allowActionGroup);
       CurrentSession.setDefault('GlobalData.checkedItems',[]);
       CurrentSession.setDefault('GlobalData.actions',config.ActionSet);
-      var Grid = self = this;
       Grid.helpers({
         "__GridView_DataView__" : function(){
           return BaseComponent.extend({
@@ -327,7 +317,6 @@
                     events['change th :checkbox'] = function(e){
                       e.stopPropagation();
                       e.stopImmediatePropagation();
-                      var CurrentSession = this.Session;
                       CurrentSession.set('GlobalData.checkedItems',[]);
                       var checkbox = $(e.target);
                       var table = checkbox.parents('table');
@@ -342,7 +331,6 @@
                       e.stopAll();
                       var th = $(e.currentTarget);
                       var sortField = th.attr('sortField');
-                      var CurrentSession = DataView.getSession();
                       var sorters2Object = CurrentSession.get('Sortation.sorters2Object');
                       var sortCombination = CurrentSession.get('Sortation.sortCombination');
                       if(!sorters2Object.hasOwnProperty(sortField)){
@@ -382,8 +370,7 @@
                   return temp;
                 },
                 "__GridView_DataView_Datas__" : function(){
-                  var self = CurrentScope = DataView.getScope();
-                  var CurrentSession = self.Session;
+                  var CurrentSession = DataView.getSession();
                   var autoId = CurrentSession.get('Columniation.autoId');
                   var multiSelection = CurrentSession.get('Columniation.multiSelection');
                   var enableActionColumn = CurrentSession.get('Columniation.enableActionColumn');
@@ -457,7 +444,6 @@
                   temp.__GridView_DataView_Datas_data__ = function(){
                     var self = DataView.getScope();
                     var Collection = self.Collection;
-                    var CurrentSession = self.Session;
                     var pageLimit = CurrentSession.get('Pagination.pageLimit');
                     var skip = CurrentSession.get('Pagination.pageSkip');
                     var sorters2Object = CurrentSession.get('Sortation.sorters2Object');
@@ -484,7 +470,6 @@
                       e.stopImmediatePropagation();
                       var self = this;
                       var checkbox = $(e.target);
-                      var CurrentSession = self.Scope.Session;
                       var checkedItems = CurrentSession.get('GlobalData.checkedItems');
                       if(checkbox.prop('checked')){
                         checkedItems.push(self._id);
